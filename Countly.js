@@ -9,7 +9,8 @@ import parseErrorStackLib from '../react-native/Libraries/Core/Devtools/parseErr
 import CountlyConfig from './CountlyConfig.js';
 
 const { CountlyReactNative } = NativeModules;
-const eventEmitter = new NativeEventEmitter(CountlyReactNative);
+
+let eventEmitter;
 
 const Countly = {};
 Countly.serverUrl = '';
@@ -58,6 +59,7 @@ Countly.TemporaryDeviceIDString = 'TemporaryDeviceID';
  * @param {String} deviceId device ID
  */
 Countly.init = async function (serverUrl, appKey, deviceId) {
+    eventEmitter = new NativeEventEmitter(CountlyReactNative);
     Countly.logError('init is deprecated, use initWithConfig instead');
     const countlyConfig = new CountlyConfig(serverUrl, appKey).setDeviceID(deviceId);
     Countly.initWithConfig(countlyConfig);
@@ -433,6 +435,7 @@ Countly.stop = function () {
         return message;
     }
     CountlyReactNative.stop();
+    if (eventEmitter) eventEmitter.removeAllListeners();
 };
 
 /**
